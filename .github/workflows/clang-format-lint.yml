@@ -1,19 +1,19 @@
-name: Clang format linter
+name: gitleaks
 on:
-  push: {}
-  pull_request: {}
-
-permissions:
-  contents: read
-
+  pull_request:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * *" # run once a day at 4 AM
 jobs:
-  build:
+  scan:
+    name: gitleaks
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v6
-    - uses: DoozyX/clang-format-lint-action@v0.20
-      with:
-        source: './src'
-        extensions: 'java'
-        clangFormatVersion: 16
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }} # Only required for Organizations, not personal accounts.
